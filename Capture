@@ -1,0 +1,367 @@
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Scanner;
+import jpcap.*;
+import jpcap.packet.IPPacket;
+import jpcap.packet.Packet;
+import jpcap.packet.TCPPacket;
+import jpcap.packet.UDPPacket;
+
+import java.util.Scanner;
+
+public class interface2 {
+	public static JpcapCaptor captor;
+	public String file = "test.java"; 
+	
+	public static List<save_in_mem> pacsave = new ArrayList<save_in_mem>();
+	
+	public void capture(int choise, NetworkInterface [] devices){
+		System.out.println("");
+		//System.out.print("Enter types of packets you want to capture (tcp/udp):");
+		
+		
+
+		try{
+			captor=JpcapCaptor.openDevice(devices[choise], 65535, false, 20);
+
+			/* Filtering if u want to flit. if filter != no then filter what u want
+			 * Otherwise no filtering
+			 */
+			 
+			
+			JpcapWriter writer = JpcapWriter.openDumpFile(captor,file);
+			
+			
+			
+			int counter = 0;
+			
+			System.out.println("");
+			System.out.print("Enter the number of TCP and UDP packets you want to capture:");
+			
+			Scanner z = new Scanner(System.in);
+			int number = z.nextInt();
+			
+			save_in_mem.setnum(number);
+			
+			while(counter < number){
+				Packet packet = captor.getPacket();
+		
+				 if(packet != null){
+					 pacsave.add( new save_in_mem(packet));
+					 System.out.println("Packet No:" + (counter+1));
+	    			 pacsave.get(counter).display();
+	    			 counter++;
+	    			 writer.writePacket(packet);
+				 }
+			} 
+			
+			System.out.println("__________________________________________________________________________");
+			System.out.println("Successfully captured Total number of packets:	 "+(counter));// TCP packets were captured Successfully... ");
+			System.out.println("Number of TCP Packets	:"+save_in_mem.tcpno+"	Number of UDP packets:	"+save_in_mem.udpno);
+			System.out.println("");
+			
+			//PacketPrinter getpac = new PacketPrinter();
+			//getpac.readfile(file);
+			captor.close();
+
+		//	writer.close();
+		}
+		catch(IOException ioe) { 
+			ioe.printStackTrace(); 
+		}	
+		
+		//Collections.sort(pacsave, new SortbysourceIP());
+		
+		
+		while(true){
+		System.out.println("__________________________________________________________________________");
+		System.out.println("");
+		System.out.println("				 PACKET QUERING");
+		System.out.println("				 --------------");
+		
+		System.out.println("	1:	Sort By length");
+		System.out.println("	2:	Source IP address");
+		System.out.println("	3:	Destination IP address");
+		System.out.println("	4: 	Source Port");
+		System.out.println("	5:	Destination Port");
+		System.out.println("	6:	TCP Packets");
+		System.out.println("	7:	UDP Packets");
+		System.out.println("	8:	Capture Packets again");
+		System.out.println("	9:	Quit");
+		System.out.println("");
+		System.out.print("Enter the query type number you want:");
+		
+		
+		Scanner x = new Scanner(System.in);
+		Scanner y = new Scanner(System.in);
+			int decision = x.nextInt();
+			
+			//System.out.println("");
+			
+			if(decision == 4){
+				System.out.println("__________________________________________________________________________");
+				System.out.println("Retrieve packets using the source port");
+				System.out.println();
+				//System.out.print("	Enter the source port:");
+				Collections.sort(pacsave, new Sorting());
+				
+				System.out.print("Enter the source Port No:");
+				int port = x.nextInt();
+				
+				save_in_mem.setze();
+				save_in_mem.setzero();
+				
+				for(int i=0; i<save_in_mem.numOfPks; i++){
+
+					if(port==(pacsave.get(i).getSPort())){ 
+					System.out.println("Packet No:" + save_in_mem.show());
+					pacsave.get(i).display();
+					if((pacsave.get(i).pactype)=="TCP") save_in_mem.tcpno++;
+					if((pacsave.get(i).pactype)=="UDP") save_in_mem.udpno++;
+					save_in_mem.increse();
+					}
+				}
+				System.out.println();
+				System.out.println("Total number of packets to this query is " + (save_in_mem.show()-1));
+				System.out.println("Number of TCP Packets	:"+save_in_mem.tcpno+"	Number of UDP packets:	"+save_in_mem.udpno);
+				
+			}
+			
+			if(decision == 2){
+			System.out.println("__________________________________________________________________________");
+				System.out.println("Retrieve packets using the source IP address");
+				System.out.println();
+				System.out.print("	Enter the source IP address:");
+				String ip = y.nextLine();
+				
+				
+				save_in_mem.setzero();
+				save_in_mem.setze();
+				
+				for(int i=0 ; i<save_in_mem.numOfPks ;i++){
+					if(ip.equals(pacsave.get(i).getsrcstring())){
+						System.out.println("Packet No:" + save_in_mem.show());
+						pacsave.get(i).display();
+						if((pacsave.get(i).pactype)=="TCP") save_in_mem.tcpno++;
+						if((pacsave.get(i).pactype)=="UDP") save_in_mem.udpno++;
+						save_in_mem.increse();
+						}
+				}
+				System.out.println();
+				System.out.println("Total number of packets to this query is " + (save_in_mem.show()-1));
+				System.out.println("Number of TCP Packets	:"+save_in_mem.tcpno+"	Number of UDP packets:	"+save_in_mem.udpno);
+			}
+			
+			if(decision == 3){
+			System.out.println("__________________________________________________________________________");
+				System.out.println("Retrieve packets using the destination IP address");
+				System.out.println();
+				System.out.print("	Enter the destination IP address:");
+				String ip = y.nextLine();
+				
+				save_in_mem.setzero();
+				save_in_mem.setze();
+				
+				for(int i=0 ; i<save_in_mem.numOfPks ;i++){
+					if(ip.equals(pacsave.get(i).getdeststring())){
+						System.out.println("Packet No:" + save_in_mem.show());
+						pacsave.get(i).display();
+						save_in_mem.increse();
+						if((pacsave.get(i).pactype)=="TCP") save_in_mem.tcpno++;
+						if((pacsave.get(i).pactype)=="UDP") save_in_mem.udpno++;
+						}
+				}
+				System.out.println();
+				System.out.println("Total number of packets to this query is " + (save_in_mem.show()-1));
+				System.out.println("Number of TCP Packets	:"+save_in_mem.tcpno+"	Number of UDP packets:	"+save_in_mem.udpno);
+			}
+			
+			if(decision == 1){
+				System.out.println("__________________________________________________________________________");
+				System.out.println("Retrieve packets using length");
+				System.out.println();
+				Collections.sort(pacsave, new Sortebylength());
+				
+				System.out.println("	1:	Retrieve packets greater than a given size");
+				System.out.println("	2:	Retrieve packets lesser than a given size");
+				System.out.println("	3:	Retrieve packets of a given size");
+				System.out.println("	Press any other key to Return");
+				System.out.println("");
+				System.out.print("Enter the type number you want:");
+				
+				int d = x.nextInt();				
+				
+				int size; //= x.nextInt();
+				
+				if(d == 1){
+					System.out.print("Enter the smallest packet size:");
+					size = x.nextInt();
+					
+					save_in_mem.setzero();//save_in_mem.counter5=0;
+					save_in_mem.setze();
+					
+					for(int i=0; i<save_in_mem.numOfPks; i++){
+						if(pacsave.get(i).getlength() >= size){
+							System.out.println("Packet No:" + save_in_mem.show());
+							//System.out.println(count);
+							pacsave.get(i).display();
+							if((pacsave.get(i).pactype)=="TCP") save_in_mem.tcpno++;
+							if((pacsave.get(i).pactype)=="UDP") save_in_mem.udpno++;
+							save_in_mem.increse();//save_in_mem.count5++;
+							}
+					}
+					System.out.println();
+					System.out.println("Total number of packets to this query is " + (save_in_mem.show()-1));
+					System.out.println("Number of TCP Packets	:"+save_in_mem.tcpno+"	Number of UDP packets:	"+save_in_mem.udpno);
+				}
+				
+				if(d == 2){
+					System.out.println("__________________________________________________________________________");
+					System.out.print("Enter the largest packet size:");
+					size = x.nextInt();
+					
+					save_in_mem.setzero();
+					save_in_mem.setze();
+					
+					for(int i=0; i<save_in_mem.numOfPks; i++){
+						if(pacsave.get(i).getlength() <= size){
+							System.out.println("Packet No:" + save_in_mem.show());
+							pacsave.get(i).display();
+							if((pacsave.get(i).pactype)=="TCP") save_in_mem.tcpno++;
+							if((pacsave.get(i).pactype)=="UDP") save_in_mem.udpno++;
+							save_in_mem.increse();
+						}
+					}
+					System.out.println();
+					System.out.println("Total number of packets to this query is " + (save_in_mem.show()-1));
+					System.out.println("Number of TCP Packets	:"+save_in_mem.tcpno+"	Number of UDP packets:	"+save_in_mem.udpno);
+				}
+				
+				if(d == 3){
+					System.out.println("__________________________________________________________________________");
+					System.out.print("Enter the packet size:");
+					size = x.nextInt();
+					
+					save_in_mem.setzero();
+					save_in_mem.setze();
+					
+					
+					for(int i=0; i<save_in_mem.numOfPks; i++){
+						if(pacsave.get(i).getlength() == size){
+							System.out.println("Packet No:" + save_in_mem.show());
+							pacsave.get(i).display();
+							if((pacsave.get(i).pactype)=="TCP") save_in_mem.tcpno++;
+							if((pacsave.get(i).pactype)=="UDP") save_in_mem.udpno++;
+							save_in_mem.increse();
+						}
+					}
+					System.out.println();
+					System.out.println("Total number of packets to this query is " + (save_in_mem.show()-1));
+					System.out.println("Number of TCP Packets	:"+save_in_mem.tcpno+"	Number of UDP packets:	"+save_in_mem.udpno);
+				}
+				
+			}
+			
+			if(decision == 5){
+				System.out.println("__________________________________________________________________________");
+				System.out.println("Retrieve packets using the destination port");
+				System.out.println();
+				//System.out.print("	Enter the source port:");
+				Collections.sort(pacsave, new Sorting());
+				
+				System.out.print("Enter the destination Port No:");
+				int port = x.nextInt();
+				
+				save_in_mem.setzero();
+				save_in_mem.setze();
+				
+				for(int i=0; i<save_in_mem.numOfPks; i++){
+					if(port==(pacsave.get(i).getdstport())){ 
+					System.out.println("Packet No:" + save_in_mem.show());
+					pacsave.get(i).display();
+					if((pacsave.get(i).pactype)=="TCP") save_in_mem.tcpno++;
+					if((pacsave.get(i).pactype)=="UDP") save_in_mem.udpno++;
+					save_in_mem.increse();
+					}
+				}
+				System.out.println();
+				System.out.println("Total number of packets to this query is " + (save_in_mem.show()-1));
+				System.out.println("Number of TCP Packets	:"+save_in_mem.tcpno+"	Number of UDP packets:	"+save_in_mem.udpno);
+			
+			
+			
+			}
+			
+			if(decision == 8){
+				save_in_mem.setzero();
+				save_in_mem.setze();
+				
+				String [] arg = {};
+				mainclass.main(arg);
+			}
+			
+			
+			if(decision == 9){
+				System.out.println("__________________________________________________________________________");
+				System.out.print("Quit from Easy packet capture... ");
+				break;
+			}
+			if(decision == 6){
+				System.out.println("__________________________________________________________________________");
+				System.out.println("Retrieve packets of the TCP Protocol");
+				System.out.println();
+				//System.out.print("	Enter the source port:");
+				Collections.sort(pacsave, new Sorting());
+				
+				save_in_mem.setzero();
+				save_in_mem.setze();
+				
+				for(int i=0; i<save_in_mem.numOfPks; i++){
+					if((pacsave.get(i).pactype=="TCP")){ 
+					System.out.println("Packet No:" + save_in_mem.show());
+					pacsave.get(i).display();
+					if((pacsave.get(i).pactype)=="TCP") save_in_mem.tcpno++;
+					if((pacsave.get(i).pactype)=="UDP") save_in_mem.udpno++;
+					save_in_mem.increse();
+					}
+				}
+				System.out.println();
+				System.out.println("Total number of packets to this query is " + (save_in_mem.show()-1));
+				System.out.println("Number of TCP Packets	:"+save_in_mem.tcpno+"	Number of UDP packets:	"+save_in_mem.udpno);
+			}
+			
+			if(decision == 7){
+				System.out.println("__________________________________________________________________________");
+				System.out.println("Retrieve packets of the UDP Protocol");
+				System.out.println();
+				//System.out.print("	Enter the source port:");
+				Collections.sort(pacsave, new Sorting());
+				
+				save_in_mem.setzero();
+				save_in_mem.setze();
+				
+				for(int i=0; i<save_in_mem.numOfPks; i++){
+					if((pacsave.get(i).pactype=="UDP")){ 
+					System.out.println("Packet No:" + save_in_mem.show());
+					pacsave.get(i).display();
+					if((pacsave.get(i).pactype)=="TCP") save_in_mem.tcpno++;
+					if((pacsave.get(i).pactype)=="UDP") save_in_mem.udpno++;
+					save_in_mem.increse();
+					}
+				}
+				System.out.println();
+				System.out.println("Total number of packets to this query is " + (save_in_mem.show()-1));
+				System.out.println("Number of TCP Packets	:"+save_in_mem.tcpno+"	Number of UDP packets:	"+save_in_mem.udpno);
+			}
+		}
+	}        
+}
+
+
+
+
+
+
+
