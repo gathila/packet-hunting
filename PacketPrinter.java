@@ -1,14 +1,21 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+/**
+ *
+ * @author Prabhath
+ */
+
 import java.io.IOException;
 
 import jpcap.*;
 import jpcap.packet.Packet;
 
-public class PacketPrinter{
-	
-	//public static int counter = 0;
-	
-	  
-	  public void readfile(String file){
+public class PacketPrinter {
+    
+      public void readfile(String file){
 		  //System.out.println();
 		  
 			try {
@@ -37,4 +44,5 @@ public class PacketPrinter{
 			}
 			
 	}	
+    
 }
